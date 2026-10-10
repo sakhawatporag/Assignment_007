@@ -1,5 +1,6 @@
 import Nav from '@/components/Nav';
 import Banner from'@/components/Banner';
+import Footer from'@/components/Footer';
 
 
 
@@ -11,6 +12,7 @@ const page = () => {
         <div className="bg-[#f7fcf8]">
           <Banner />
         </div>
+        <Footer />
 
        
       </main>
