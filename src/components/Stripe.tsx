@@ -42,19 +42,11 @@ const getProductLogo = (product: Product) =>
   product.photo ||
   product.icon;
 
-const fallbackProducts: Product[] = [
-  { id: 'rice', name: 'চাল', price: 75, change: 2, isUp: true },
-  { id: 'lentils', name: 'ডাল', price: 120, change: -1, isDrop: true },
-  { id: 'oil', name: 'সয়াবিন তেল', price: 175, change: 0 },
-  { id: 'potato', name: 'আলু', price: 35, change: -3, isDrop: true },
-  { id: 'onion', name: 'পেঁয়াজ', price: 85, change: 4, isUp: true },
-];
-
 const isImageUrl = (value: string) =>
   value.startsWith('/') || value.startsWith('http://') || value.startsWith('https://');
 
 const PriceTickerStrip = () => {
-  const [products, setProducts] = useState<Product[]>(fallbackProducts);
+  const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -97,7 +89,7 @@ const PriceTickerStrip = () => {
     return null;
   }
 
-  // Repeat the sequence enough times to keep the strip filled on wide screens.
+  
   const displayItems = [...products, ...products, ...products, ...products];
 
   return (

@@ -1,5 +1,6 @@
 import React from 'react';
 import Image from 'next/image';
+import Link from 'next/link';
 import TodayDate from './TodayDate';
 
 const Nav = () => {
@@ -19,19 +20,19 @@ const Nav = () => {
                 </div>
 
                 <nav aria-label="প্রধান নেভিগেশন" className="flex shrink-0 items-center gap-1 font-['Hind_Siliguri',sans-serif] sm:gap-4">
-                    <a
-                        href="#signin"
+                    <Link
+                        href="/signin"
                         className="group relative px-2 py-2 text-sm font-bold text-slate-800 transition-colors hover:text-[#008744] sm:px-3 sm:text-lg"
                     >
                         সাইন ইন
                         <span className="absolute bottom-1.5 left-2.5 right-2.5 h-0.5 origin-center scale-x-0 rounded bg-[#008744] transition-transform duration-200 group-hover:scale-x-100 sm:left-3 sm:right-3" />
-                    </a>
-                    <a
-                        href="#signup"
+                    </Link>
+                    <Link
+                        href="/signup"
                         className="rounded-xl bg-[#008744] px-3.5 py-2 text-sm font-bold text-white shadow-[0_4px_14px_rgba(0,135,68,0.35)] transition-all hover:-translate-y-0.5 hover:bg-[#00994c] hover:shadow-[0_8px_20px_rgba(0,135,68,0.45)] active:translate-y-0 sm:px-6 sm:py-3 sm:text-lg"
                     >
                         সাইন আপ
-                    </a>
+                    </Link>
                 </nav>
             </div>
         </header>
