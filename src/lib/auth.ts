@@ -4,7 +4,15 @@ import { MongoClient } from "mongodb";
 import { mongodbAdapter } from "@better-auth/mongo-adapter";
 import { memoryAdapter } from "@better-auth/memory-adapter";
 
-const mongoUrl = process.env.MONGODB_URL;
+function environmentValue(value: string | undefined) {
+  const trimmed = value?.trim();
+  if (!trimmed) return undefined;
+  return trimmed.replace(/^['"]|['"]$/g, "");
+}
+
+const mongoUrl =
+  environmentValue(process.env.MONGODB_URL) ||
+  environmentValue(process.env.MONGODB_URI);
 const validMongoUrl =
   mongoUrl &&
   (mongoUrl.startsWith("mongodb://") || mongoUrl.startsWith("mongodb+srv://")) &&
@@ -24,9 +32,12 @@ const database = client && db
       verification: [],
     });
 
-const googleClientId = process.env.GOOGLE_CLIENT_ID || process.env.GOOGLE_ID;
+const googleClientId =
+  environmentValue(process.env.GOOGLE_CLIENT_ID) ||
+  environmentValue(process.env.GOOGLE_ID);
 const googleClientSecret =
-  process.env.GOOGLE_CLIENT_SECRET || process.env.GOOGLE_SECRET;
+  environmentValue(process.env.GOOGLE_CLIENT_SECRET) ||
+  environmentValue(process.env.GOOGLE_SECRET);
 const socialProviders = {
   ...(googleClientId && googleClientSecret
     ? {
@@ -36,11 +47,12 @@ const socialProviders = {
         },
       }
     : {}),
-  ...(process.env.GITHUB_CLIENT_ID && process.env.GITHUB_CLIENT_SECRET
+  ...(environmentValue(process.env.GITHUB_CLIENT_ID) &&
+  environmentValue(process.env.GITHUB_CLIENT_SECRET)
     ? {
         github: {
-          clientId: process.env.GITHUB_CLIENT_ID,
-          clientSecret: process.env.GITHUB_CLIENT_SECRET,
+          clientId: environmentValue(process.env.GITHUB_CLIENT_ID)!,
+          clientSecret: environmentValue(process.env.GITHUB_CLIENT_SECRET)!,
         },
       }
     : {}),
