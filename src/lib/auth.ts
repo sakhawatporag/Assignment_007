@@ -46,22 +46,34 @@ const socialProviders = {
     : {}),
 };
 
-const vercelOrigin = process.env.VERCEL_URL
-    ? `https://${process.env.VERCEL_URL}`
-    : undefined;
+function normalizeOrigin(value: string | undefined) {
+    if (!value) return undefined;
+
+    try {
+      const candidate = value.startsWith("http://") || value.startsWith("https://")
+        ? value
+        : `https://${value}`;
+      return new URL(candidate).origin;
+    } catch {
+      console.error("Ignoring invalid auth URL environment variable:", value);
+      return undefined;
+    }
+}
+
+const vercelOrigin = normalizeOrigin(
+    process.env.VERCEL_PROJECT_PRODUCTION_URL || process.env.VERCEL_URL,
+);
 const appOrigin =
-    process.env.NEXT_PUBLIC_APP_URL ||
-    vercelOrigin ||
-    process.env.BETTER_AUTH_URL ||
-    "http://localhost:3000";
+      normalizeOrigin(process.env.NEXT_PUBLIC_APP_URL) ||
+      vercelOrigin ||
+      normalizeOrigin(process.env.BETTER_AUTH_URL) ||
+      "http://localhost:3000";
 const staticTrustedOrigins = [
-    appOrigin,
-    process.env.BETTER_AUTH_URL,
-    process.env.VERCEL_BRANCH_URL
-      ? `https://${process.env.VERCEL_BRANCH_URL}`
-      : undefined,
-    "http://localhost:3000",
-    "http://127.0.0.1:3000",
+      appOrigin,
+      normalizeOrigin(process.env.BETTER_AUTH_URL),
+      normalizeOrigin(process.env.VERCEL_BRANCH_URL),
+      "http://localhost:3000",
+      "http://127.0.0.1:3000",
 ].filter((origin): origin is string => Boolean(origin));
 const trustedOrigins = async (request?: Request) => {
   const requestOrigin = request?.headers.get("origin");
@@ -78,8 +90,11 @@ const allowedHosts = [
   "*.vercel.app",
   ...([process.env.VERCEL_URL, process.env.VERCEL_BRANCH_URL]
     .filter((host): host is string => Boolean(host))),
-  ...(process.env.NEXT_PUBLIC_APP_URL
-    ? [new URL(process.env.NEXT_PUBLIC_APP_URL).host]
+  ...(normalizeOrigin(process.env.NEXT_PUBLIC_APP_URL)
+    ? [new URL(normalizeOrigin(process.env.NEXT_PUBLIC_APP_URL)!).host]
+    : []),
+  ...(normalizeOrigin(process.env.BETTER_AUTH_URL)
+    ? [new URL(normalizeOrigin(process.env.BETTER_AUTH_URL)!).host]
     : []),
 ];
 
