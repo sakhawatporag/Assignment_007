@@ -54,7 +54,7 @@ const appOrigin =
     vercelOrigin ||
     process.env.BETTER_AUTH_URL ||
     "http://localhost:3000";
-const trustedOrigins = [
+const staticTrustedOrigins = [
     appOrigin,
     process.env.BETTER_AUTH_URL,
     process.env.VERCEL_BRANCH_URL
@@ -63,12 +63,35 @@ const trustedOrigins = [
     "http://localhost:3000",
     "http://127.0.0.1:3000",
 ].filter((origin): origin is string => Boolean(origin));
+const trustedOrigins = async (request?: Request) => {
+  const requestOrigin = request?.headers.get("origin");
+  const requestUrlOrigin = request ? new URL(request.url).origin : undefined;
+  return [
+    ...staticTrustedOrigins,
+    requestOrigin,
+    requestUrlOrigin,
+  ].filter((origin): origin is string => Boolean(origin));
+};
+const allowedHosts = [
+  "localhost:3000",
+  "127.0.0.1:3000",
+  "*.vercel.app",
+  ...([process.env.VERCEL_URL, process.env.VERCEL_BRANCH_URL]
+    .filter((host): host is string => Boolean(host))),
+  ...(process.env.NEXT_PUBLIC_APP_URL
+    ? [new URL(process.env.NEXT_PUBLIC_APP_URL).host]
+    : []),
+];
 
 export const auth = betterAuth({
     secret:
       process.env.BETTER_AUTH_SECRET ||
       randomUUID(),
-    baseURL: appOrigin,
+    baseURL: {
+      allowedHosts,
+      fallback: appOrigin,
+      protocol: appOrigin.startsWith("https://") ? "https" : "http",
+    },
     trustedOrigins,
   emailAndPassword: {
     enabled: true,
