@@ -8,6 +8,12 @@ export function GET() {
   const mongoConfigured = isConfigured(
     process.env.MONGODB_URL || process.env.MONGODB_URI,
   );
+  const databaseMode =
+    process.env.NODE_ENV === "production"
+      ? mongoConfigured
+        ? "configured"
+        : "missing"
+      : "memory";
   const googleConfigured = Boolean(
     isConfigured(process.env.GOOGLE_CLIENT_ID || process.env.GOOGLE_ID) &&
       isConfigured(process.env.GOOGLE_CLIENT_SECRET || process.env.GOOGLE_SECRET),
@@ -19,7 +25,7 @@ export function GET() {
 
   return NextResponse.json({
     ok: Boolean(process.env.BETTER_AUTH_SECRET),
-    database: mongoConfigured ? "configured" : "missing",
+    database: databaseMode,
     providers: {
       google: googleConfigured,
       github: githubConfigured,

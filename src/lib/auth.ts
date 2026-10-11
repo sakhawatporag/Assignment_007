@@ -24,16 +24,16 @@ const client = validMongoUrl ? new MongoClient(validMongoUrl) : null;
 const db = client?.db("bazar-dor");
 
 const database =
-  client && db
-    ? mongodbAdapter(db, { client })
-    : process.env.NODE_ENV === "production"
-      ? undefined
-      : memoryAdapter({
-          user: [],
-          session: [],
-          account: [],
-          verification: [],
-        });
+  process.env.NODE_ENV !== "production"
+    ? memoryAdapter({
+        user: [],
+        session: [],
+        account: [],
+        verification: [],
+      })
+    : client && db
+      ? mongodbAdapter(db, { client })
+      : undefined;
 
 const googleClientId =
   environmentValue(process.env.GOOGLE_CLIENT_ID) ||
