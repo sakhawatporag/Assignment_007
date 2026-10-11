@@ -11,6 +11,11 @@ export default function SignUp() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [socialSubmitting, setSocialSubmitting] = useState<'google' | 'github' | null>(null);
 
+ 
+  function getCallbackURL() {
+    return `${window.location.origin}/`;
+  }
+
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     setError('');
@@ -33,7 +38,7 @@ export default function SignUp() {
         name,
         email,
         password,
-        callbackURL: '/',
+        callbackURL: getCallbackURL(),
       });
 
       if (signUpError) {
@@ -58,7 +63,7 @@ export default function SignUp() {
     try {
       const { error: socialError } = await authClient.signIn.social({
         provider,
-        callbackURL: '/',
+        callbackURL: getCallbackURL(),
       });
       if (socialError) {
         setError(
