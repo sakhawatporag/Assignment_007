@@ -12,6 +12,7 @@ type PriceChange = {
 
 type Product = {
   id: number | string;
+  slug: string;
   nameBn: string;
   category: string;
   categoryNameBn: string;
@@ -150,9 +151,11 @@ export default function MiniNavDetails({ slug }: MiniNavDetailsProps) {
                     : `${isUp ? '+' : ''}${formatNumber(product.change.pct)}%`;
 
                 return (
-                  <article
+                  <Link
                     key={product.id}
-                    className="rounded-xl border border-[#e3ece5] bg-white p-4 shadow-[0_3px_14px_rgba(30,83,48,0.04)]"
+                    href={`/product/${product.slug}`}
+                    className="rounded-xl border border-[#e3ece5] bg-white p-4 shadow-[0_3px_14px_rgba(30,83,48,0.04)] transition hover:-translate-y-0.5 hover:border-[#b9dcc4] hover:shadow-[0_8px_20px_rgba(30,83,48,0.08)] focus:outline-none focus:ring-2 focus:ring-[#008744]/40"
+                    aria-label={`${product.nameBn} এর বিস্তারিত দেখুন`}
                   >
                     <div className="flex items-start gap-3">
                       <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-[#f0f7f1] text-2xl">
@@ -180,7 +183,7 @@ export default function MiniNavDetails({ slug }: MiniNavDetailsProps) {
                         {isUp ? '↗' : isDown ? '↘' : '—'} {changeLabel}
                       </span>
                     </div>
-                  </article>
+                  </Link>
                 );
               })}
             </div>

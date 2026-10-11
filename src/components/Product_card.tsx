@@ -1,6 +1,7 @@
  'use client';
 
 import { useCallback, useEffect, useState } from 'react';
+import Link from 'next/link';
 
 const PRODUCTS_API = 'https://api.api-store.workers.dev/api/bazardor/products';
 
@@ -11,6 +12,7 @@ type PriceChange = {
 
 type Product = {
   id: number | string;
+  slug: string;
   nameBn: string;
   categoryNameBn: string;
   categoryIcon: string;
@@ -37,7 +39,11 @@ function ProductCard({ product }: ProductCardProps) {
       : `${changeIsUp ? '+' : ''}${formatNumber(product.change.pct)}%`;
 
   return (
-    <article className="group flex min-h-35.5 flex-col justify-between rounded-2xl border border-[#e6eee8] bg-white p-4 shadow-[0_4px_18px_rgba(30,83,48,0.05)] transition duration-200 hover:-translate-y-1 hover:border-[#b9dcc4] hover:shadow-[0_10px_26px_rgba(30,83,48,0.11)] sm:min-h-39 sm:p-5">
+    <Link
+      href={`/product/${product.slug}`}
+      className="group flex min-h-35.5 flex-col justify-between rounded-2xl border border-[#e6eee8] bg-white p-4 shadow-[0_4px_18px_rgba(30,83,48,0.05)] transition duration-200 hover:-translate-y-1 hover:border-[#b9dcc4] hover:shadow-[0_10px_26px_rgba(30,83,48,0.11)] focus:outline-none focus:ring-2 focus:ring-[#008744]/40 sm:min-h-39 sm:p-5"
+      aria-label={`${product.nameBn} এর বিস্তারিত দেখুন`}
+    >
       <div className="flex items-start gap-3">
         <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-[#f0f7f1] text-2xl transition-colors group-hover:bg-[#e1f2e5]">
           {product.image || product.categoryIcon}
@@ -71,7 +77,7 @@ function ProductCard({ product }: ProductCardProps) {
           {changeIsUp ? '↗' : changeIsDown ? '↘' : '—'} {changeLabel}
         </span>
       </div>
-    </article>
+    </Link>
   );
 }
 
