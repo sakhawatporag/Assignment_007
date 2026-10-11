@@ -1,4 +1,5 @@
 import { betterAuth } from "better-auth";
+import { randomUUID } from "node:crypto";
 import { MongoClient } from "mongodb";
 import { mongodbAdapter } from "@better-auth/mongo-adapter";
 import { memoryAdapter } from "@better-auth/memory-adapter";
@@ -46,6 +47,10 @@ const socialProviders = {
 };
 
 export const auth = betterAuth({
+  secret:
+    process.env.BETTER_AUTH_SECRET ||
+    randomUUID(),
+  baseURL: process.env.BETTER_AUTH_URL,
   emailAndPassword: {
     enabled: true,
   },
