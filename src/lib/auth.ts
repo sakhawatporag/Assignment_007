@@ -46,11 +46,30 @@ const socialProviders = {
     : {}),
 };
 
+const vercelOrigin = process.env.VERCEL_URL
+    ? `https://${process.env.VERCEL_URL}`
+    : undefined;
+const appOrigin =
+    process.env.NEXT_PUBLIC_APP_URL ||
+    vercelOrigin ||
+    process.env.BETTER_AUTH_URL ||
+    "http://localhost:3000";
+const trustedOrigins = [
+    appOrigin,
+    process.env.BETTER_AUTH_URL,
+    process.env.VERCEL_BRANCH_URL
+      ? `https://${process.env.VERCEL_BRANCH_URL}`
+      : undefined,
+    "http://localhost:3000",
+    "http://127.0.0.1:3000",
+].filter((origin): origin is string => Boolean(origin));
+
 export const auth = betterAuth({
-  secret:
-    process.env.BETTER_AUTH_SECRET ||
-    randomUUID(),
-  baseURL: process.env.BETTER_AUTH_URL,
+    secret:
+      process.env.BETTER_AUTH_SECRET ||
+      randomUUID(),
+    baseURL: appOrigin,
+    trustedOrigins,
   emailAndPassword: {
     enabled: true,
   },
