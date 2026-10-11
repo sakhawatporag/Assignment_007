@@ -4,6 +4,7 @@ import Link from 'next/link';
 import { FormEvent, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { authClient } from '@/lib/auth-client';
+import { getAuthErrorMessage } from '@/lib/auth-errors';
 
 export default function SignUp() {
   const router = useRouter();
@@ -27,6 +28,12 @@ export default function SignUp() {
     const password = String(formData.get('password') ?? '');
     const confirmPassword = String(formData.get('confirm-password') ?? '');
 
+    if (!name || !email || !password || !confirmPassword) {
+      setError('সব তথ্য পূরণ করুন।');
+      setIsSubmitting(false);
+      return;
+    }
+
     if (password !== confirmPassword) {
       setError('দুটি পাসওয়ার্ড একই নয়।');
       setIsSubmitting(false);
@@ -42,7 +49,12 @@ export default function SignUp() {
       });
 
       if (signUpError) {
-        setError(signUpError.message || 'অ্যাকাউন্ট তৈরি করা যায়নি। আবার চেষ্টা করুন।');
+        setError(
+          getAuthErrorMessage(
+            signUpError,
+            'অ্যাকাউন্ট তৈরি করা যায়নি। আবার চেষ্টা করুন।',
+          ),
+        );
         return;
       }
 
@@ -67,14 +79,18 @@ export default function SignUp() {
       });
       if (socialError) {
         setError(
-          socialError.message ||
-            `${provider} লগইন করা যায়নি। Vercel-এর auth configuration যাচাই করুন।`,
+          getAuthErrorMessage(
+            socialError,
+            `${provider} লগইন করা যায়নি। আবার চেষ্টা করুন।`,
+          ),
         );
         setSocialSubmitting(null);
       }
     } catch (socialError) {
       console.error(`Error signing in with ${provider}:`, socialError);
-      setError(`${provider} দিয়ে সাইন ইন করা যায়নি। OAuth সেটিংস যাচাই করুন।`);
+      setError(`${provider} দিয়ে সাইন ইন করা যায়নি। আবার চেষ্টা করুন।`);
+      setSocialSubmitting(null);
+    } finally {
       setSocialSubmitting(null);
     }
   }
@@ -101,6 +117,7 @@ export default function SignUp() {
                 id="name"
                 name="name"
                 type="text"
+                required
                 placeholder="যেমন: রাফি উদ্দিন"
                 className="h-11 w-full rounded-lg border border-[#dfe8e1] bg-white px-3 text-sm outline-none transition placeholder:text-[#9ba59e] focus:border-[#008744] focus:ring-2 focus:ring-[#008744]/10"
               />
@@ -114,6 +131,7 @@ export default function SignUp() {
                 id="email"
                 name="email"
                 type="email"
+                required
                 placeholder="you@example.com"
                 className="h-11 w-full rounded-lg border border-[#dfe8e1] bg-white px-3 text-sm outline-none transition placeholder:text-[#9ba59e] focus:border-[#008744] focus:ring-2 focus:ring-[#008744]/10"
               />
@@ -128,6 +146,7 @@ export default function SignUp() {
                 name="password"
                 type="password"
                 minLength={6}
+                required
                 placeholder="কমপক্ষে ৬ অক্ষর"
                 className="h-11 w-full rounded-lg border border-[#dfe8e1] bg-white px-3 text-sm outline-none transition placeholder:text-[#9ba59e] focus:border-[#008744] focus:ring-2 focus:ring-[#008744]/10"
               />
@@ -141,6 +160,7 @@ export default function SignUp() {
                 id="confirm-password"
                 name="confirm-password"
                 type="password"
+                required
                 placeholder="আবার লিখুন"
                 className="h-11 w-full rounded-lg border border-[#dfe8e1] bg-white px-3 text-sm outline-none transition placeholder:text-[#9ba59e] focus:border-[#008744] focus:ring-2 focus:ring-[#008744]/10"
               />

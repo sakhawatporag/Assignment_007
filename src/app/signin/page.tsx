@@ -4,6 +4,7 @@ import Link from 'next/link';
 import { FormEvent, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { authClient } from '@/lib/auth-client';
+import { getAuthErrorMessage } from '@/lib/auth-errors';
 
 export default function SignIn() {
   const router = useRouter();
@@ -20,15 +21,26 @@ export default function SignIn() {
     const email = String(formData.get('email') ?? '').trim();
     const password = String(formData.get('password') ?? '');
 
+    if (!email || !password) {
+      setError('ইমেইল ও পাসওয়ার্ড লিখুন।');
+      setIsSubmitting(false);
+      return;
+    }
+
     try {
       const { error: signInError } = await authClient.signIn.email({
         email,
         password,
-        callbackURL: '/',
+        callbackURL: `${window.location.origin}/`,
       });
 
       if (signInError) {
-        setError(signInError.message || 'সাইন ইন করা যায়নি। ইমেইল ও পাসওয়ার্ড যাচাই করুন।');
+        setError(
+          getAuthErrorMessage(
+            signInError,
+            'সাইন ইন করা যায়নি। ইমেইল ও পাসওয়ার্ড যাচাই করুন।',
+          ),
+        );
         return;
       }
 
@@ -49,18 +61,22 @@ export default function SignIn() {
     try {
       const { error: socialError } = await authClient.signIn.social({
         provider,
-        callbackURL: '/',
+        callbackURL: `${window.location.origin}/`,
       });
       if (socialError) {
         setError(
-          socialError.message ||
-            `${provider} লগইন করা যায়নি। Vercel-এর auth configuration যাচাই করুন।`,
+          getAuthErrorMessage(
+            socialError,
+            `${provider} লগইন করা যায়নি। আবার চেষ্টা করুন।`,
+          ),
         );
         setSocialSubmitting(null);
       }
     } catch (socialError) {
       console.error(`Error signing in with ${provider}:`, socialError);
-      setError(`${provider} দিয়ে সাইন ইন করা যায়নি। OAuth সেটিংস যাচাই করুন।`);
+      setError(`${provider} দিয়ে সাইন ইন করা যায়নি। আবার চেষ্টা করুন।`);
+      setSocialSubmitting(null);
+    } finally {
       setSocialSubmitting(null);
     }
   }
@@ -85,6 +101,7 @@ export default function SignIn() {
                 id="email"
                 name="email"
                 type="email"
+                required
                 placeholder="you@example.com"
                 className="h-12 w-full rounded-lg border border-[#dfe8e1] bg-white px-3 text-sm outline-none transition placeholder:text-[#9ba59e] focus:border-[#008744] focus:ring-2 focus:ring-[#008744]/10"
               />
@@ -99,6 +116,7 @@ export default function SignIn() {
                 name="password"
                 type="password"
                 minLength={6}
+                required
                 placeholder="কমপক্ষে ৬ অক্ষর"
                 className="h-12 w-full rounded-lg border border-[#dfe8e1] bg-white px-3 text-sm outline-none transition placeholder:text-[#9ba59e] focus:border-[#008744] focus:ring-2 focus:ring-[#008744]/10"
               />
