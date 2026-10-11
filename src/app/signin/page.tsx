@@ -54,7 +54,7 @@ export default function SignIn() {
       if (socialError) {
         setError(
           socialError.message ||
-            `${provider} লগইন চালু করতে OAuth credentials যোগ করুন।`,
+            `${provider} লগইন করা যায়নি। Vercel-এর auth configuration যাচাই করুন।`,
         );
         setSocialSubmitting(null);
       }

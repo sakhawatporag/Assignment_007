@@ -23,14 +23,17 @@ const validMongoUrl =
 const client = validMongoUrl ? new MongoClient(validMongoUrl) : null;
 const db = client?.db("bazar-dor");
 
-const database = client && db
-  ? mongodbAdapter(db, { client })
-  : memoryAdapter({
-      user: [],
-      session: [],
-      account: [],
-      verification: [],
-    });
+const database =
+  client && db
+    ? mongodbAdapter(db, { client })
+    : process.env.NODE_ENV === "production"
+      ? undefined
+      : memoryAdapter({
+          user: [],
+          session: [],
+          account: [],
+          verification: [],
+        });
 
 const googleClientId =
   environmentValue(process.env.GOOGLE_CLIENT_ID) ||
@@ -112,8 +115,10 @@ const allowedHosts = [
 
 export const auth = betterAuth({
     secret:
-      process.env.BETTER_AUTH_SECRET ||
-      randomUUID(),
+      environmentValue(process.env.BETTER_AUTH_SECRET) ||
+      (process.env.NODE_ENV === "production"
+        ? "missing-production-secret-configure-in-vercel"
+        : randomUUID()),
     baseURL: {
       allowedHosts,
       fallback: appOrigin,
