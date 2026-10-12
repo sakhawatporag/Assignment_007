@@ -60,7 +60,7 @@ const Nav = () => {
                                     <p className="truncate text-sm text-[#819087]">{user.email}</p>
                                     <div className="my-4 h-px bg-[#edf2ee]" />
                                     <Link
-                                        href="/"
+                                        href="/profile"
                                         role="menuitem"
                                         onClick={() => setMenuOpen(false)}
                                         className="flex items-center gap-2 rounded-lg px-2 py-2 text-base font-semibold text-[#4c5850] transition hover:bg-[#f5faf6] hover:text-[#008744]"
